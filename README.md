@@ -1,3 +1,6 @@
+# Week 1 Overview:
+The core concept that students need to understand is working side by side with AI tools such as Claude or Github Copilot specifically debugging code. There's a highlight where students shouldn't rely on AI, the students should begin with testing the state it's in. Could they target which code needs to be debugged or have minor adjustments? I believe it's a great start on developing questions and prompting that to AI. I believe where students will most likely to struggle is figuring out where to debug. There would be minor bugs in the code that can be completely missed. However, AI was helpful on elaborating on specfic code I was unsure about or the intended behavior. A part that AI was misleading is where there was a specific code that needed to be adjusted, AI would provide an influx of unnecessary code. A way I would guide a student without giving them the answers is determine which criteria is which and it's intended behavior and having a follow up of insight notes such as the sidebar, checkboxes, and lucky picks.   
+
 # Playlist Chaos
 
 Your AI assistant tried to build a smart playlist generator. The app runs, but some of the behavior is unpredictable. Your task is to explore the app, investigate the code, and use an AI assistant to debug and improve it.
