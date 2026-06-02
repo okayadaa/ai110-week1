@@ -188,6 +188,7 @@ def profile_sidebar():
     st.sidebar.header("Mood profile")
 
     profile = st.session_state.profile
+    genre_options = ["rock", "lofi", "pop", "jazz", "electronic", "ambient", "other"]
 
     profile["name"] = st.sidebar.text_input(
         "Profile name",
@@ -210,10 +211,12 @@ def profile_sidebar():
             value=int(profile.get("chill_max_energy", 3)),
         )
 
+    st.session_state["favorite_genre"] = "rock"
     profile["favorite_genre"] = st.sidebar.selectbox(
         "Favorite genre",
-        options=["rock", "lofi", "pop", "jazz", "electronic", "ambient", "other"],
-        index=0,
+        options=genre_options,
+        index=genre_options.index("rock"),
+        key="favorite_genre",
     )
 
     profile["include_mixed"] = st.sidebar.checkbox(
@@ -229,7 +232,7 @@ def add_song_sidebar():
     st.sidebar.header("Add a song")
 
     title = st.sidebar.text_input("Title")
-    artist = st.sidebar.text_input("Artist")
+    artist = st.sidebar.text_input("Artist").strip().lower()
     genre = st.sidebar.selectbox(
         "Genre",
         options=["rock", "lofi", "pop", "jazz", "electronic", "ambient", "other"],
@@ -268,6 +271,14 @@ def playlist_tabs(playlists):
     for label, tab in zip(tab_labels, tabs):
         with tab:
             render_playlist(label, playlists.get(label, []))
+
+
+def visible_playlists(playlists):
+    """Return the playlists that should be shown for the current profile."""
+    if st.session_state.profile.get("include_mixed", True):
+        return playlists
+
+    return {name: songs for name, songs in playlists.items() if name != "Mixed"}
 
 
 def render_playlist(label, songs):
@@ -354,12 +365,18 @@ def history_section():
         st.write("No history yet.")
         return
 
-    summary = history_summary(history)
+    include_mixed = st.session_state.profile.get("include_mixed", True)
+    if include_mixed:
+        visible_history = history
+    else:
+        visible_history = [song for song in history if song.get("mood") != "Mixed"]
+
+    summary = history_summary(visible_history)
     st.write("Recent picks by mood:", summary)
 
     show_details = st.checkbox("Show full history")
     if show_details:
-        for song in history:
+        for song in visible_history:
             st.write(
                 f"{song.get('mood', '?')}: {song['title']} by {song['artist']}"
             )
@@ -393,12 +410,13 @@ def main():
 
     base_playlists = build_playlists(songs, profile)
     merged_playlists = merge_playlists(base_playlists, {})
+    active_playlists = visible_playlists(merged_playlists)
 
-    playlist_tabs(merged_playlists)
+    playlist_tabs(active_playlists)
     st.divider()
-    lucky_section(merged_playlists)
+    lucky_section(active_playlists)
     st.divider()
-    stats_section(merged_playlists)
+    stats_section(active_playlists)
     st.divider()
     history_section()
 
